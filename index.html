@@ -3,14 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 
+    IMPORTANT: Replace the value of finalDestination with your newly deployed Web App URL 
+    (make sure it includes any required parameters, e.g., ?row=... if needed).
+  -->
   <script>
-    // Redirect after 1 second
-    setTimeout(() => {
-      window.location.href = "https://script.google.com/macros/s/AKfycbz206hzdVBs6kHkiZ4zXdcHVwrQkBSmGt69_nYgLndVL9nB5Z9rEgGgCCGzMzNe088d/exec";
-    }, 1000);
+    // Final destination: update this URL whenever you deploy a new version.
+    var finalDestination = "https://script.google.com/macros/s/AKfycbwwT0oJqhRp7e-RJjUJIHt7Zi80lC-KI28QN1cAr1CnhCeqfszBtexVdK6MIfoghyry/exec";
+    // Immediately redirect the browser.
+    window.location.href = finalDestination;
   </script>
+  <!-- Meta refresh as a fallback -->
+  <meta http-equiv="refresh" content="0;URL='https://script.google.com/macros/s/AKfycbwwT0oJqhRp7e-RJjUJIHt7Zi80lC-KI28QN1cAr1CnhCeqfszBtexVdK6MIfoghyry/exec'" />
 </head>
 <body>
-  <h2>Please wait while we redirect you to share your location...</h2>
+  <p>Redirecting... If you are not redirected automatically, please <a href="https://script.google.com/macros/s/AKfycbwwT0oJqhRp7e-RJjUJIHt7Zi80lC-KI28QN1cAr1CnhCeqfszBtexVdK6MIfoghyry/exec">click here</a>.</p>
 </body>
 </html>
