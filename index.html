@@ -4,20 +4,31 @@
   <meta charset="UTF-8">
   <title>Redirecting...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- 
-    IMPORTANT: Replace the value of finalDestination with your newly deployed Web App URL 
-    (make sure it includes any required parameters, e.g., ?row=... if needed).
-  -->
   <script>
-    // Final destination: update this URL whenever you deploy a new version.
-    var finalDestination = "https://script.google.com/macros/s/AKfycbwsvBT3HQYKkj1RB2CgJpz98wVBKrAbrNNGjdIcyYfMRiGiaXAS8Q-oFFRd_9rUmO3T/exec";
-    // Immediately redirect the browser.
-    window.location.href = finalDestination;
+    // Get the query parameters from the URL
+    const params = new URLSearchParams(window.location.search);
+    const targetUrl = params.get("target");
+
+    if (targetUrl) {
+      // Immediately redirect to the target URL
+      window.location.href = targetUrl;
+    } else {
+      // If no target is provided, show an error message
+      document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("message").innerText = "Error: No target URL provided.";
+      });
+    }
   </script>
-  <!-- Meta refresh as a fallback -->
-  <meta http-equiv="refresh" content="0;URL='https://script.google.com/macros/s/AKfycbwsvBT3HQYKkj1RB2CgJpz98wVBKrAbrNNGjdIcyYfMRiGiaXAS8Q-oFFRd_9rUmO3T/exec'" />
 </head>
 <body>
-  <p>Redirecting... If you are not redirected automatically, please <a href="https://script.google.com/macros/s/AKfycbwsvBT3HQYKkj1RB2CgJpz98wVBKrAbrNNGjdIcyYfMRiGiaXAS8Q-oFFRd_9rUmO3T/exec">click here</a>.</p>
+  <h2 id="message">Redirecting...</h2>
+  <p>If you are not redirected automatically, please <a id="fallbackLink" href="#">click here</a>.</p>
+  <script>
+    // Set up the fallback link
+    const fallbackLink = document.getElementById("fallbackLink");
+    if (targetUrl) {
+      fallbackLink.href = targetUrl;
+    }
+  </script>
 </body>
 </html>
