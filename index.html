@@ -1,60 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Food Donation QR Generator</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
-      background: #f2f2f2;
-      text-align: center;
-    }
+<!-- … your existing <head> and styles … -->
 
-    h1 {
-      color: #333;
-    }
-
-    #submitBtn {
-      background-color: #4CAF50;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    #submitBtn:hover {
-      background-color: #45a049;
-    }
-
-    #qrCode {
-      margin-top: 20px;
-    }
-
-    .loader {
-      display: none;
-      margin: 20px auto;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #4CAF50;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .output-section {
-      margin-top: 2rem;
-    }
-  </style>
-</head>
 <body>
   <h1>Food Donation QR Generator</h1>
   <p>Click the button to share your location & generate a QR code</p>
@@ -65,15 +10,20 @@
   <div id="shareLink" class="output-section"></div>
 
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbw5xYhHeSpQzmDl4dKMlHYEwRs82MkoApjTxuLfOMc1A2hzZcwql2LcfGGqWj7ajmcd/exec"; // Replace with your deployed Apps Script URL
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbzpJwX0egub0Dzk4xvIDGsdjk1zOKzqhQPupFALD0W2Ca2EYPlEhenVa5SzefQTngH_/exec";
 
-    document.getElementById("submitBtn").addEventListener("click", () => {
+    const btn = document.getElementById("submitBtn");
+    const loader = document.getElementById("loader");
+
+    btn.addEventListener("click", () => {
       if (!navigator.geolocation) {
         alert("Geolocation is not supported by your browser.");
         return;
       }
 
-      document.getElementById("loader").style.display = "block";
+      btn.disabled = true;
+      loader.style.display = "block";
+
       navigator.geolocation.getCurrentPosition(success, error);
     });
 
@@ -85,10 +35,12 @@
       fetch(`${scriptUrl}?location=${encodeURIComponent(locationUrl)}`)
         .then(response => response.json())
         .then(data => {
-          document.getElementById("loader").style.display = "none";
+          loader.style.display = "none";
+          btn.disabled = false;
 
           if (data.status === "success") {
-            document.getElementById("qrCode").innerHTML = `<img src="${data.qrCodeUrl}" alt="QR Code">`;
+            document.getElementById("qrCode").innerHTML =
+              `<img src="${data.qrCodeUrl}" alt="QR Code">`;
             document.getElementById("shareLink").innerHTML = `
               <p><strong>WhatsApp Share Link:</strong><br/>
               <a href="${data.whatsappLink}" target="_blank">${data.whatsappLink}</a></p>`;
@@ -97,15 +49,16 @@
           }
         })
         .catch(err => {
-          document.getElementById("loader").style.display = "none";
+          loader.style.display = "none";
+          btn.disabled = false;
           alert("Error: " + err.message);
         });
     }
 
     function error(err) {
-      document.getElementById("loader").style.display = "none";
+      loader.style.display = "none";
+      btn.disabled = false;
       alert("Unable to retrieve your location. Please allow location access.");
     }
   </script>
 </body>
-</html>
