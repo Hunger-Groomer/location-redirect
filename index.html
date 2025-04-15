@@ -1,102 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Food Donation QR Generator</title>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Fallback meta refresh after 5 seconds -->
+  <meta http-equiv="refresh" content="5">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
-      background: #f2f2f2;
       text-align: center;
-    }
-    h1 {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 50px;
       color: #333;
     }
-    #submitBtn {
-      background-color: #4CAF50;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    #submitBtn:hover {
-      background-color: #45a049;
-    }
-    #qrCode {
-      margin-top: 20px;
-    }
-    .loader {
-      display: none;
-      margin: 20px auto;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #4CAF50;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .output-section {
-      margin-top: 2rem;
+    a {
+      color: #4285F4;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h1>Food Donation QR Generator</h1>
-  <p>Click the button to share your location & generate a QR code</p>
-  <button id="submitBtn">Generate QR</button>
-  <div class="loader" id="loader"></div>
-  <div id="qrCode" class="output-section"></div>
-  <div id="shareLink" class="output-section"></div>
+  <h2 id="message">Redirecting, please wait...</h2>
+  <p>If you are not redirected automatically, please <a id="fallbackLink" href="#">click here</a>.</p>
   
   <script>
-    // Replace YOUR_DEPLOYED_SCRIPT_ID with your actual deployed Apps Script ID
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbwHOX11iWGOL0S6flZfJhvnhF-pt1DGjyVK50pUppW8Ymvo_o7c_TLkJ7nzrraUDIv8/exec";
+    // Get the 'target' parameter from the URL query string.
+    const params = new URLSearchParams(window.location.search);
+    const targetUrl = params.get("target");
     
-    document.getElementById("submitBtn").addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser.");
-        return;
-      }
-      document.getElementById("loader").style.display = "block";
-      navigator.geolocation.getCurrentPosition(success, error);
-    });
-    
-    function success(position) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      // Correctly using template literals: wrap the URL in backticks
-      const locationUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
-      // Use template literals for fetch as well
-      fetch(`${scriptUrl}?location=${encodeURIComponent(locationUrl)}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById("loader").style.display = "none";
-          if (data.status === "success") {
-            document.getElementById("qrCode").innerHTML = `<img src="${data.qrCodeUrl}" alt="QR Code">`;
-            document.getElementById("shareLink").innerHTML = `
-              <p><strong>WhatsApp Share Link:</strong><br/>
-              <a href="${data.whatsappLink}" target="_blank">${data.whatsappLink}</a></p>`;
-          } else {
-            alert("Something went wrong: " + data.message);
-          }
-        })
-        .catch(err => {
-          document.getElementById("loader").style.display = "none";
-          alert("Error: " + err.message);
-        });
-    }
-    
-    function error(err) {
-      document.getElementById("loader").style.display = "none";
-      alert("Unable to retrieve your location. Please allow location access.");
+    // Set the fallback link for manual redirection.
+    if (targetUrl) {
+      document.getElementById("fallbackLink").href = targetUrl;
+      document.getElementById("message").innerText = "Redirecting to your destination...";
+      
+      // Wait 1 second, then redirect.
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 1000);
+    } else {
+      document.getElementById("message").innerText = "Error: No target URL provided.";
     }
   </script>
 </body>
