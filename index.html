@@ -7,14 +7,14 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f2f2f2;
-      color: #333;
-      text-align: center;
       padding: 2rem;
+      background: #f2f2f2;
+      text-align: center;
     }
-    h1 { margin-bottom: 0.5rem; }
-    p.subtitle { margin-top: 0; color: #666; }
-    button {
+    h1 {
+      color: #333;
+    }
+    #submitBtn {
       background-color: #4CAF50;
       color: white;
       padding: 12px 24px;
@@ -22,13 +22,16 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.2s ease;
     }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-    button:hover:not(:disabled) { background-color: #45a049; }
+    #submitBtn:hover {
+      background-color: #45a049;
+    }
+    #qrCode {
+      margin-top: 20px;
+    }
     .loader {
       display: none;
-      margin: 1rem auto;
+      margin: 20px auto;
       border: 4px solid #f3f3f3;
       border-top: 4px solid #4CAF50;
       border-radius: 50%;
@@ -36,73 +39,64 @@
       height: 40px;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .output { margin-top: 2rem; }
-    .output img { max-width: 100%; height: auto; }
-    .output a { color: #4CAF50; word-break: break-all; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .output-section {
+      margin-top: 2rem;
+    }
   </style>
 </head>
 <body>
   <h1>Food Donation QR Generator</h1>
-  <p class="subtitle">Share your location & generate a WhatsApp‑ready QR code</p>
-  <button id="generateBtn">Generate QR</button>
+  <p>Click the button to share your location & generate a QR code</p>
+  <button id="submitBtn">Generate QR</button>
   <div class="loader" id="loader"></div>
-
-  <div class="output" id="qrContainer"></div>
-  <div class="output" id="linkContainer"></div>
-
+  <div id="qrCode" class="output-section"></div>
+  <div id="shareLink" class="output-section"></div>
+  
   <script>
+    // Replace YOUR_DEPLOYED_SCRIPT_ID with your actual deployed Apps Script ID
     const scriptUrl = "https://script.google.com/macros/s/AKfycbwHOX11iWGOL0S6flZfJhvnhF-pt1DGjyVK50pUppW8Ymvo_o7c_TLkJ7nzrraUDIv8/exec";
-
-    const btn = document.getElementById('generateBtn');
-    const loader = document.getElementById('loader');
-    const qrContainer = document.getElementById('qrContainer');
-    const linkContainer = document.getElementById('linkContainer');
-
-    btn.addEventListener('click', () => {
+    
+    document.getElementById("submitBtn").addEventListener("click", () => {
       if (!navigator.geolocation) {
-        alert('Geolocation not supported by your browser.');
+        alert("Geolocation is not supported by your browser.");
         return;
       }
-      btn.disabled = true;
-      loader.style.display = 'block';
-      qrContainer.innerHTML = '';
-      linkContainer.innerHTML = '';
-
-      navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 10000 });
+      document.getElementById("loader").style.display = "block";
+      navigator.geolocation.getCurrentPosition(success, error);
     });
-
-    function onSuccess(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      const locationUrl = `https://maps.google.com/?q=${lat},${lng}`;
-
+    
+    function success(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      // Correctly using template literals: wrap the URL in backticks
+      const locationUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
+      // Use template literals for fetch as well
       fetch(`${scriptUrl}?location=${encodeURIComponent(locationUrl)}`)
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
-          loader.style.display = 'none';
-          btn.disabled = false;
-
-          if (data.status === 'success') {
-            qrContainer.innerHTML = `<img src="${data.qrCodeUrl}" alt="QR Code">`;
-            linkContainer.innerHTML = `
-              <p><strong>WhatsApp Share Link:</strong></p>
-              <a href="${data.whatsappLink}" target="_blank">${data.whatsappLink}</a>`;
+          document.getElementById("loader").style.display = "none";
+          if (data.status === "success") {
+            document.getElementById("qrCode").innerHTML = `<img src="${data.qrCodeUrl}" alt="QR Code">`;
+            document.getElementById("shareLink").innerHTML = `
+              <p><strong>WhatsApp Share Link:</strong><br/>
+              <a href="${data.whatsappLink}" target="_blank">${data.whatsappLink}</a></p>`;
           } else {
-            alert('Error: ' + data.message);
+            alert("Something went wrong: " + data.message);
           }
         })
         .catch(err => {
-          loader.style.display = 'none';
-          btn.disabled = false;
-          alert('Fetch error: ' + err.message);
+          document.getElementById("loader").style.display = "none";
+          alert("Error: " + err.message);
         });
     }
-
-    function onError(err) {
-      loader.style.display = 'none';
-      btn.disabled = false;
-      alert('Unable to retrieve location: ' + err.message);
+    
+    function error(err) {
+      document.getElementById("loader").style.display = "none";
+      alert("Unable to retrieve your location. Please allow location access.");
     }
   </script>
 </body>
