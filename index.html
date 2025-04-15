@@ -32,11 +32,6 @@
     .btn:hover {
       background-color: #3367d6;
     }
-    #message {
-      margin-top: 20px;
-      font-size: 0.9rem;
-      color: #d32f2f;
-    }
   </style>
 </head>
 <body>
@@ -44,30 +39,25 @@
   <p>Please click the button below to share your location.</p>
   <button class="btn" id="shareLocationBtn">Share My Location</button>
   <p id="message"></p>
-
+  
   <script>
-    // Replace FINAL_DESTINATION with the same URL you use in your Apps Script (WEB_APP_URL)
-    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbzVq8xlwqRUl3phlaWkzpeMcqDMsST51CrzEYWsO-9trM8mt0_zlCaePyYUGgw0loIh/exec";
+    // Replace FINAL_DESTINATION with your deployed Apps Script web app URL.
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycby20Kdx1cIoXQdTlkCSnhW7FTmKneuhMa3yfuo-ZDXeJ3aV7fpp8ngta-MjmHYqLOIc/exec";
     
-    // When the button is clicked, request geolocation.
     document.getElementById("shareLocationBtn").addEventListener("click", () => {
       const messageElem = document.getElementById("message");
-      
       if (!navigator.geolocation) {
         messageElem.innerText = "Geolocation is not supported by your browser.";
         return;
       }
-      
       messageElem.innerText = "Fetching your location...";
-      
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Build the URL with lat and lng as query parameters.
+          // Build the final destination URL including lat & lng as query parameters.
           const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
           messageElem.innerText = "Redirecting...";
-          // Redirect the user to the final destination.
           window.location.href = destinationUrl;
         },
         (err) => {
