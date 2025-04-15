@@ -1,46 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Redirecting...</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Fallback meta refresh after 5 seconds -->
-  <meta http-equiv="refresh" content="5">
+  <title>Share Your Location</title>
   <style>
     body {
-      text-align: center;
       font-family: Arial, sans-serif;
+      text-align: center;
       background: #f2f2f2;
       padding: 50px;
+      margin: 0;
+    }
+    h2 {
       color: #333;
     }
-    a {
-      color: #4285F4;
-      text-decoration: none;
+    p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    .btn {
+      background-color: #4285F4;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .btn:hover {
+      background-color: #3367d6;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #d32f2f;
     }
   </style>
 </head>
 <body>
-  <h2 id="message">Redirecting, please wait...</h2>
-  <p>If you are not redirected automatically, please <a id="fallbackLink" href="#">click here</a>.</p>
-  
+  <h2>Share Your Location</h2>
+  <p>Please click the button below to share your location.</p>
+  <button class="btn" id="shareLocationBtn">Share My Location</button>
+  <p id="message"></p>
+
   <script>
-    // Get the 'target' parameter from the URL query string.
-    const params = new URLSearchParams(window.location.search);
-    const targetUrl = params.get("target");
-    
-    // Set the fallback link for manual redirection.
-    if (targetUrl) {
-      document.getElementById("fallbackLink").href = targetUrl;
-      document.getElementById("message").innerText = "Redirecting to your destination...";
+    // Replace FINAL_DESTINATION with your deployed Google Apps Script Web App URL.
+    // For example: "https://script.google.com/macros/s/AKfycbxYourScriptID/exec"
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbyCZxMrVA6fVXUnNb3n6INbAXAdE42iBTmYE9Ii7SYHnOSaElJ2b6pvEPX3nwqMSyw/exec";
+
+    document.getElementById("shareLocationBtn").addEventListener("click", () => {
+      const messageElem = document.getElementById("message");
       
-      // Wait 1 second, then redirect.
-      setTimeout(() => {
-        window.location.href = targetUrl;
-      }, 1000);
-    } else {
-      document.getElementById("message").innerText = "Error: No target URL provided.";
-    }
+      if (!navigator.geolocation) {
+        messageElem.innerText = "Geolocation is not supported by your browser.";
+        return;
+      }
+      
+      messageElem.innerText = "Fetching your location...";
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          // Build the final destination URL including latitude and longitude as query parameters.
+          const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
+          messageElem.innerText = "Redirecting...";
+          // Redirect the user to the final destination.
+          window.location.href = destinationUrl;
+        },
+        (error) => {
+          messageElem.innerText = "Error fetching location: " + error.message;
+        }
+      );
+    });
   </script>
 </body>
 </html>
