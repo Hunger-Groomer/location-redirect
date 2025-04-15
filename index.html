@@ -32,6 +32,11 @@
     .btn:hover {
       background-color: #3367d6;
     }
+    #message {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #d32f2f;
+    }
   </style>
 </head>
 <body>
@@ -41,8 +46,8 @@
   <p id="message"></p>
   
   <script>
-    // Replace FINAL_DESTINATION with your deployed Apps Script web app URL.
-    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycby20Kdx1cIoXQdTlkCSnhW7FTmKneuhMa3yfuo-ZDXeJ3aV7fpp8ngta-MjmHYqLOIc/exec";
+    // FINAL_DESTINATION here is your deployed Google Apps Script Web App URL.
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbx13Sh565yJVj2emU3pSbD1tTKAGzdhZB-_R_NEWt2eTsJnRrSwXPYRY287QOp65Qq5/exec";
     
     document.getElementById("shareLocationBtn").addEventListener("click", () => {
       const messageElem = document.getElementById("message");
@@ -55,7 +60,7 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Build the final destination URL including lat & lng as query parameters.
+          // Build the URL: you can pass latitude and longitude as parameters.
           const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
           messageElem.innerText = "Redirecting...";
           window.location.href = destinationUrl;
