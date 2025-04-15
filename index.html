@@ -46,8 +46,8 @@
   <p id="message"></p>
   
   <script>
-    // FINAL_DESTINATION here is your deployed Google Apps Script Web App URL.
-    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbxDHVBw4lKOIavtjbCSKx30mbBX3ZtXHuyxvDMqQjb1NmFruc7GrE_QCWqxFusQiq3g/exec";
+    // FINAL_DESTINATION is your deployed Apps Script Web App URL.
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbwpYR5SXH6WnIci6VXtfBISHrhdSu0C35p_vNYfxujr_6cXCHH6-DyklHsI_XBtzyh3/exec";
     
     document.getElementById("shareLocationBtn").addEventListener("click", () => {
       const messageElem = document.getElementById("message");
@@ -60,7 +60,7 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Build the URL: you can pass latitude and longitude as parameters.
+          // Build the URL with lat & lng query parameters.
           const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
           messageElem.innerText = "Redirecting...";
           window.location.href = destinationUrl;
