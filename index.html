@@ -8,7 +8,7 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: #f2f2f2;
+      background: #f9f9f9;
       padding: 50px;
       margin: 0;
     }
@@ -46,10 +46,10 @@
   <p id="message"></p>
 
   <script>
-    // Replace FINAL_DESTINATION with your deployed Google Apps Script Web App URL.
-    // For example: "https://script.google.com/macros/s/AKfycbxYourScriptID/exec"
-    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbwUZmgVENdnymWTObzw5DnaiXRCZ98KIY7zNYzQnEjg7ml4rOfGIKyucvPcGVbG1QI2/exec";
-
+    // Replace FINAL_DESTINATION with the same URL you use in your Apps Script (WEB_APP_URL)
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbxEf96wuK78mLAsY5KVPVSvwka92Rekyjz-g205N-fGapZ0ZWrdLbA1lh3hPaEQnXDu/exec";
+    
+    // When the button is clicked, request geolocation.
     document.getElementById("shareLocationBtn").addEventListener("click", () => {
       const messageElem = document.getElementById("message");
       
@@ -64,14 +64,14 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Build the final destination URL including latitude and longitude as query parameters.
+          // Build the URL with lat and lng as query parameters.
           const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
           messageElem.innerText = "Redirecting...";
           // Redirect the user to the final destination.
           window.location.href = destinationUrl;
         },
-        (error) => {
-          messageElem.innerText = "Error fetching location: " + error.message;
+        (err) => {
+          messageElem.innerText = "Error fetching location: " + err.message;
         }
       );
     });
