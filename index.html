@@ -47,7 +47,7 @@
   
   <script>
     // FINAL_DESTINATION is your deployed Apps Script Web App URL.
-    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbwmLxFzG6IOO181XD-O-HFGY0Vo-bwejNF-bWZr4pumILslUerMlSyPq5L92-ESlNx9/exec";
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbxyEnaSCW4ILYtpYtvX_wIjv8NG5CWZ2V6K1I5n4kO_jJA02i4peJRMNsV6LwYIF3PO/exec";
     
     document.getElementById("shareLocationBtn").addEventListener("click", () => {
       const messageElem = document.getElementById("message");
@@ -60,7 +60,7 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Build the URL with lat & lng parameters.
+          // Build the URL with lat & lng query parameters.
           const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
           messageElem.innerText = "Redirecting...";
           window.location.href = destinationUrl;
@@ -73,4 +73,3 @@
   </script>
 </body>
 </html>
-b
