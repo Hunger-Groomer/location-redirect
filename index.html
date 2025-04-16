@@ -5,38 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Share Your Location</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f9f9f9;
-      padding: 50px;
-      margin: 0;
-    }
-    h2 {
-      color: #333;
-    }
-    p {
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
-    .btn {
-      background-color: #4285F4;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
-    .btn:hover {
-      background-color: #3367d6;
-    }
-    #message {
-      margin-top: 20px;
-      font-size: 0.9rem;
-      color: #d32f2f;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; padding: 50px; margin: 0; }
+    h2 { color: #333; }
+    p { font-size: 1rem; margin-bottom: 20px; }
+    .btn { background-color: #4285F4; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
+    .btn:hover { background-color: #3367d6; }
+    #message { margin-top: 20px; font-size: 0.9rem; color: #d32f2f; }
   </style>
 </head>
 <body>
@@ -46,8 +20,7 @@
   <p id="message"></p>
   
   <script>
-    // FINAL_DESTINATION is your deployed Apps Script Web App URL.
-    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbzCVw2V6H9Xu3KX5mo2XU44zwGsnz_Cw_2cBquoyo02rt5YBnRooOxpehtrfE5DsquB/exec";
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbydhvCOQUroFSotKvFuNr3oTanObs32qeaTHng6DIfLNcipu7S4QBXHXG9Le2V-Gvd2/exec";
     
     document.getElementById("shareLocationBtn").addEventListener("click", () => {
       const messageElem = document.getElementById("message");
@@ -60,7 +33,6 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Build the URL with lat & lng query parameters.
           const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
           messageElem.innerText = "Redirecting...";
           window.location.href = destinationUrl;
