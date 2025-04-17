@@ -5,39 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Share Your Location</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f9f9f9;
-      padding: 20px;
-      margin: 0;
-    }
-    h2 {
-      color: #333;
-      margin-bottom: 15px;
-    }
-    p {
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
-    .btn {
-      background-color: #4285F4;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
-    .btn:hover {
-      background-color: #3367d6;
-    }
-    #message {
-      color: #555;
-      font-style: italic;
-      margin-top: 15px;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; padding: 20px; margin: 0; }
+    h2 { color: #333; margin-bottom: 15px; }
+    p { font-size: 1rem; margin-bottom: 20px; }
+    .btn { background-color: #4285F4; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
+    .btn:hover { background-color: #3367d6; }
+    #message { color: #555; font-style: italic; margin-top: 15px; }
   </style>
 </head>
 <body>
@@ -48,7 +21,7 @@
 
   <script>
     // Your deployed Apps Script URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM1dRpOtfBujs_wT7Jr5v002IoQ-xMG9JU6n4agVk3gpnpnH1FVW7kxvptSKVge2Yf/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzkbZuufOfSMCKtbiIRQnuPkSpSQwzJLYuKC6mmK9DUMMymPWwpavZH7iLSNHJbFR0A/exec";
 
     // Extract 'row' from URL
     const params = new URLSearchParams(window.location.search);
