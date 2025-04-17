@@ -2,27 +2,176 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Redirecting…</title>
-  <script>
-    // Read the “target” param (the Apps Script URL with ?row=)
-    const params = new URLSearchParams(location.search);
-    const target = params.get("target");
-    if (target) {
-      // Immediately go there
-      window.location.replace(target);
-    } else {
-      document.addEventListener("DOMContentLoaded", () => {
-        document.body.textContent = "❌ No valid target URL provided.";
-      });
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Share Your Location</title>
+  <!-- Include jsPDF library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f9f9f9;
+      padding: 20px;
+      margin: 0;
     }
-  </script>
+    h2 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    .btn {
+      background-color: #4285F4;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+      margin: 10px;
+      display: inline-block;
+    }
+    .btn:hover {
+      background-color: #3367d6;
+    }
+    .btn-green {
+      background-color: #34A853;
+    }
+    .btn-green:hover {
+      background-color: #2d8f49;
+    }
+    .qr-container {
+      margin: 20px auto;
+      max-width: 300px;
+    }
+    #qrImage {
+      display: none;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background: white;
+    }
+    #message {
+      color: #555;
+      font-style: italic;
+    }
+    .company-name {
+      font-weight: bold;
+      margin-top: 30px;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-  <p>If you aren’t redirected automatically, <a id="link">click here</a>.</p>
+  <h2>📍 Share Your Location</h2>
+  <p>Please click the button below to share your location.</p>
+  <button class="btn" id="shareLocationBtn">Share My Location</button>
+  
+  <!-- Add a button for downloading QR as PDF -->
+  <button class="btn btn-green" id="downloadQrBtn" style="display: none;">Download QR Code as PDF</button>
+  
+  <div class="qr-container">
+    <img id="qrImage" alt="QR Code">
+  </div>
+  
+  <p id="message"></p>
+  
   <script>
-    const link = document.getElementById("link");
-    link.href = new URLSearchParams(location.search).get("target") || "#";
+    // Replace with your deployed Apps Script web app URL
+    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbwEf96wuK78mLAsY5KVPVSvwka92Rekyjz-g205N-fGapZ0ZWrdLbA1lh3hPaEQnXDu/exec";
+    
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const rowParam = urlParams.get('row');
+    const targetParam = urlParams.get('target');
+    
+    // Check if we're being redirected
+    if (targetParam) {
+      window.location.href = decodeURIComponent(targetParam);
+    }
+    // If row parameter exists, show QR code
+    else if (rowParam) {
+      // Generate QR code URL
+      const qrCodeUrl = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(FINAL_DESTINATION + "?row=" + rowParam)}`;
+      
+      // Display the QR code
+      const qrImage = document.getElementById("qrImage");
+      qrImage.src = qrCodeUrl;
+      qrImage.style.display = "block";
+      
+      // Show download button
+      document.getElementById("downloadQrBtn").style.display = "inline-block";
+    }
+    
+    document.getElementById("shareLocationBtn").addEventListener("click", () => {
+      const messageElem = document.getElementById("message");
+      if (!navigator.geolocation) {
+        messageElem.innerText = "Geolocation is not supported by your browser.";
+        return;
+      }
+      messageElem.innerText = "Fetching your location...";
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          // Build the final destination URL including lat & lng as query parameters
+          const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}${rowParam ? '&row=' + rowParam : ''}`;
+          messageElem.innerText = "Redirecting...";
+          window.location.href = destinationUrl;
+        },
+        (err) => {
+          messageElem.innerText = "Error fetching location: " + err.message;
+        }
+      );
+    });
+    
+    // PDF generation functionality
+    document.getElementById("downloadQrBtn").addEventListener("click", () => {
+      try {
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Get QR code image
+        const qrImage = document.getElementById("qrImage");
+        
+        // Add title
+        doc.setFontSize(18);
+        doc.text("Location Request QR Code", 105, 20, {align: "center"});
+        
+        // Add instructions
+        doc.setFontSize(12);
+        doc.text("Please scan this QR code to share your location:", 105, 35, {align: "center"});
+        
+        // Add QR code to PDF (centered)
+        doc.addImage(qrImage.src, "PNG", 55, 45, 100, 100);
+        
+        // Add additional instructions
+        doc.setFontSize(10);
+        doc.text("1. Open your phone's camera app", 105, 160, {align: "center"});
+        doc.text("2. Point it at the QR code above", 105, 170, {align: "center"});
+        doc.text("3. Tap the notification that appears", 105, 180, {align: "center"});
+        doc.text("4. Allow location access when prompted", 105, 190, {align: "center"});
+        
+        // Add footer with date
+        const today = new Date();
+        doc.setFontSize(8);
+        doc.text(`Generated on ${today.toLocaleDateString()}`, 105, 280, {align: "center"});
+        
+        // Save PDF
+        doc.save(`location-qr-code-row-${rowParam}.pdf`);
+        
+        document.getElementById("message").innerText = "PDF downloaded successfully!";
+      } catch (err) {
+        console.error("Error generating PDF:", err);
+        document.getElementById("message").innerText = "Error generating PDF. Please try again.";
+      }
+    });
   </script>
 </body>
 </html>
