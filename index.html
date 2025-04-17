@@ -1,57 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Share Your Location</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; padding: 20px; margin: 0; }
-    h2 { color: #333; margin-bottom: 15px; }
-    p { font-size: 1rem; margin-bottom: 20px; }
-    .btn { background-color: #4285F4; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
-    .btn:hover { background-color: #3367d6; }
-    #message { color: #555; font-style: italic; margin-top: 15px; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #6b73ff 0%, #000dff 100%);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      max-width: 90%;
+      width: 500px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    p {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    .btn {
+      background: #ffca28;
+      color: #000;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.2s;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 600;
+    }
+    .btn:hover {
+      background: #ffd54f;
+      transform: translateY(-2px);
+    }
+    .loader {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-top: 1.5rem;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .privacy-notice {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    .error {
+      background: rgba(255, 59, 48, 0.2);
+      color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    #counter {
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
-  <h2>📍 Share Your Location</h2>
-  <p>Please click the button below to share your location.</p>
-  <button class="btn" id="shareLocationBtn">Share My Location</button>
-  <p id="message"></p>
-
+  <div class="container">
+    <h1>📍 Secure Location Sharing</h1>
+    <div id="error" class="error">Invalid link: missing or incorrect parameters.</div>
+    <p>You're being securely redirected to our location sharing service.</p>
+    <a id="redirectBtn" class="btn">Continue</a>
+    <div class="loader" id="loader"></div>
+    <div id="counter"></div>
+    <div class="privacy-notice">
+      Your location data will only be used for the purpose specified in your request. 
+      Your privacy is important to us.
+    </div>
+  </div>
   <script>
-    // Your deployed Apps Script URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxf8BrOwXjrClTRFbs6mBMIdsHMuXrFgvDZwRZjJgWzBhC4AzRRuYsSBc2v4e3D0wMB/exec";
-
-    // Extract 'row' from URL
+    // Hardcoded Apps Script URL - THIS MUST BE UPDATED
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbwwFJw4GrcfwmIhOFC96D8-PfjeandCe60xsGjm8Ok5kNyUe3NXjVeVl0eZsdKsK2Xz/exec';
     const params = new URLSearchParams(window.location.search);
     const row = params.get('row');
-    const messageElem = document.getElementById('message');
-    const shareBtn = document.getElementById('shareLocationBtn');
-
-    if (!row) {
-      messageElem.innerText = 'Invalid link: missing row parameter.';
-      shareBtn.disabled = true;
-    } else {
-      shareBtn.addEventListener('click', () => {
-        if (!navigator.geolocation) {
-          messageElem.innerText = 'Geolocation is not supported by your browser.';
-          return;
+    const secureId = params.get('id');
+    const btn = document.getElementById('redirectBtn');
+    const loader = document.getElementById('loader');
+    const errorDiv = document.getElementById('error');
+    const counterDiv = document.getElementById('counter');
+    
+    let count = 3;
+    let countdownTimer;
+    
+    function startCountdown() {
+      counterDiv.innerHTML = `Redirecting in ${count} seconds...`;
+      countdownTimer = setInterval(() => {
+        count--;
+        if (count <= 0) {
+          clearInterval(countdownTimer);
+          redirect();
+        } else {
+          counterDiv.innerHTML = `Redirecting in ${count} seconds...`;
         }
-        messageElem.innerText = 'Fetching your location...';
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            messageElem.innerText = 'Redirecting...';
-            window.location.href = `${SCRIPT_URL}?lat=${lat}&lng=${lng}&row=${row}`;
-          },
-          (error) => {
-            messageElem.innerText = 'Error fetching location: ' + error.message;
-          }
-        );
-      });
+      }, 1000);
     }
-  </script>
-</body>
-</html>
+    
+    function redirect() {
+      if (!row && !secureId) {
+        errorDiv.style.display = 'block';
+        counterDiv.style.display = 'none';
+        clearInterval(countdownTimer);
+        return;
+      }
+      
+      // Build appropriate target URL based on available parameters
+      let target;
+      if (secureId) {
+        target = `${webAppUrl}?id=${secureId}`;
+      } else if (row) {
+        target = `${webAppUrl}?row=${row}`;
+      } else {
+        errorDiv.style.display = 'block';
+        counterDiv.style.display = 'none';
+        clearInterval(countdownTimer);
+        return;
+      }
+      
+      loader.style.display = 'block';
+      btn.style.display = 'none';
+      counterDiv.style.display = 'none';
+      
+      // Short delay to show the loading animation
+      setTimeout(() => {
+        try {
+          window.location.replace(target);
+        } catch (e) {
+          errorDiv.style.display = 'block';
+          errorDiv.textContent = "Redirect failed. Please try the button again.";
+          btn.style.display = 'inline-block';
+          loader.style.display = 'none';
+        }
+      }, 800);
+    }
+    
+    // Check for mobile device
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    // If on mobile, show a notice about location permissions
+    if (isMobile()) {
+      const notice = document.createElement('p');
+      notice.innerHTML = "You may need to enable location permissions in your browser.";
+      notice.style.fontSize = "0.8rem";
+      notice.style.opacity = "0.8";
+      document.querySelector('.container').insertBefore(notice, document.querySelector('.privacy-notice'));
+    }
+    
+    // Auto-redirect after short delay for desktop, but require click for mobile
+    if (!isMobile()) {
+      startCountdown();
+    } else {
+      counterDiv.style.display = 'none';
+    }
+    
+    btn.addEventListener('click', redirect);
+    
+    // For security, clear parameters from URL bar without reloading page
+    if (window.history && window.history.replaceState) {
+      const cleanUrl = window.location.href.split('?')[0];
+      window.history.replaceState({}, document.title, cleanUrl);
