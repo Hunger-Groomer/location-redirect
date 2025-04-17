@@ -2,46 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Share Your Location</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; padding: 50px; margin: 0; }
-    h2 { color: #333; }
-    p { font-size: 1rem; margin-bottom: 20px; }
-    .btn { background-color: #4285F4; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
-    .btn:hover { background-color: #3367d6; }
-    #message { margin-top: 20px; font-size: 0.9rem; color: #d32f2f; }
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redirecting…</title>
+  <script>
+    // Read the “target” param (the Apps Script URL with ?row=)
+    const params = new URLSearchParams(location.search);
+    const target = params.get("target");
+    if (target) {
+      // Immediately go there
+      window.location.replace(target);
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.textContent = "❌ No valid target URL provided.";
+      });
+    }
+  </script>
 </head>
 <body>
-  <h2>Share Your Location</h2>
-  <p>Please click the button below to share your location.</p>
-  <button class="btn" id="shareLocationBtn">Share My Location</button>
-  <p id="message"></p>
-  
+  <p>If you aren’t redirected automatically, <a id="link">click here</a>.</p>
   <script>
-    const FINAL_DESTINATION = "https://script.google.com/macros/s/AKfycbzJwYfNhwGLF0_ffWFvuxwcGltLHCpkchGloU04tQ72OO7vJMtMoe-OSfIU7WGkq_nD/exec";
-    
-    document.getElementById("shareLocationBtn").addEventListener("click", () => {
-      const messageElem = document.getElementById("message");
-      if (!navigator.geolocation) {
-        messageElem.innerText = "Geolocation is not supported by your browser.";
-        return;
-      }
-      messageElem.innerText = "Fetching your location...";
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const destinationUrl = `${FINAL_DESTINATION}?lat=${lat}&lng=${lng}`;
-          messageElem.innerText = "Redirecting...";
-          window.location.href = destinationUrl;
-        },
-        (err) => {
-          messageElem.innerText = "Error fetching location: " + err.message;
-        }
-      );
-    });
+    const link = document.getElementById("link");
+    link.href = new URLSearchParams(location.search).get("target") || "#";
   </script>
 </body>
 </html>
