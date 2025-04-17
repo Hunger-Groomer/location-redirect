@@ -84,10 +84,11 @@
       margin-bottom: 1.5rem;
       display: none;
     }
-    #counter {
-      font-size: 0.9rem;
+    #debug {
+      font-size: 0.7rem;
       margin-top: 1rem;
-      opacity: 0.8;
+      color: rgba(255,255,255,0.5);
+      display: none;
     }
   </style>
 </head>
@@ -98,101 +99,91 @@
     <p>You're being securely redirected to our location sharing service.</p>
     <a id="redirectBtn" class="btn">Continue</a>
     <div class="loader" id="loader"></div>
-    <div id="counter"></div>
+    <div id="debug"></div>
     <div class="privacy-notice">
       Your location data will only be used for the purpose specified in your request. 
       Your privacy is important to us.
     </div>
   </div>
   <script>
-    // Hardcoded Apps Script URL - THIS MUST BE UPDATED
+    // UPDATE THIS URL with your deployed Google Apps Script web app URL
     const webAppUrl = 'https://script.google.com/macros/s/AKfycbwwFJw4GrcfwmIhOFC96D8-PfjeandCe60xsGjm8Ok5kNyUe3NXjVeVl0eZsdKsK2Xz/exec';
+    
     const params = new URLSearchParams(window.location.search);
-    const row = params.get('row');
-    const secureId = params.get('id');
     const btn = document.getElementById('redirectBtn');
     const loader = document.getElementById('loader');
     const errorDiv = document.getElementById('error');
-    const counterDiv = document.getElementById('counter');
+    const debugDiv = document.getElementById('debug');
     
-    let count = 3;
-    let countdownTimer;
+    // Extract parameters from URL
+    const row = params.get('row');
+    const id = params.get('id');
     
-    function startCountdown() {
-      counterDiv.innerHTML = `Redirecting in ${count} seconds...`;
-      countdownTimer = setInterval(() => {
-        count--;
-        if (count <= 0) {
-          clearInterval(countdownTimer);
-          redirect();
-        } else {
-          counterDiv.innerHTML = `Redirecting in ${count} seconds...`;
-        }
-      }, 1000);
+    // For direct testing functionality
+    function showDebug(message) {
+      debugDiv.style.display = 'block';
+      debugDiv.textContent = message;
     }
     
     function redirect() {
-      if (!row && !secureId) {
+      // Check if we have any valid parameter
+      if (!row && !id) {
         errorDiv.style.display = 'block';
-        counterDiv.style.display = 'none';
-        clearInterval(countdownTimer);
         return;
       }
       
-      // Build appropriate target URL based on available parameters
-      let target;
-      if (secureId) {
-        target = `${webAppUrl}?id=${secureId}`;
+      // Select the appropriate parameter for the redirect
+      let targetUrl;
+      if (id) {
+        targetUrl = `${webAppUrl}?id=${encodeURIComponent(id)}`;
       } else if (row) {
-        target = `${webAppUrl}?row=${row}`;
+        targetUrl = `${webAppUrl}?row=${encodeURIComponent(row)}`;
       } else {
         errorDiv.style.display = 'block';
-        counterDiv.style.display = 'none';
-        clearInterval(countdownTimer);
         return;
       }
       
+      // Show loading animation
       loader.style.display = 'block';
       btn.style.display = 'none';
-      counterDiv.style.display = 'none';
       
-      // Short delay to show the loading animation
+      // For debugging
+      showDebug(`Redirecting to: ${targetUrl}`);
+      
+      // Perform redirect after a short delay
       setTimeout(() => {
         try {
-          window.location.replace(target);
+          // Open in same window/tab
+          window.location.href = targetUrl;
+          
+          // Alternative method if the above doesn't work
+          setTimeout(() => {
+            window.location.replace(targetUrl);
+          }, 500);
         } catch (e) {
           errorDiv.style.display = 'block';
-          errorDiv.textContent = "Redirect failed. Please try the button again.";
+          errorDiv.textContent = "Redirect failed: " + e.message;
           btn.style.display = 'inline-block';
           loader.style.display = 'none';
         }
       }, 800);
     }
     
-    // Check for mobile device
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-    
-    // If on mobile, show a notice about location permissions
-    if (isMobile()) {
-      const notice = document.createElement('p');
-      notice.innerHTML = "You may need to enable location permissions in your browser.";
-      notice.style.fontSize = "0.8rem";
-      notice.style.opacity = "0.8";
-      document.querySelector('.container').insertBefore(notice, document.querySelector('.privacy-notice'));
-    }
-    
-    // Auto-redirect after short delay for desktop, but require click for mobile
-    if (!isMobile()) {
-      startCountdown();
-    } else {
-      counterDiv.style.display = 'none';
-    }
-    
+    // Attach click handler to button
     btn.addEventListener('click', redirect);
     
-    // For security, clear parameters from URL bar without reloading page
-    if (window.history && window.history.replaceState) {
-      const cleanUrl = window.location.href.split('?')[0];
-      window.history.replaceState({}, document.title, cleanUrl);
+    // Check URL parameters on page load
+    window.onload = function() {
+      // Show error if no valid parameters
+      if (!row && !id) {
+        errorDiv.style.display = 'block';
+      }
+      
+      // Enable debug mode with URL parameter
+      if (params.get('debug') === 'true') {
+        showDebug(`Parameters: row=${row}, id=${id}`);
+      }
+    };
+  </script>
+</body>
+</html>
